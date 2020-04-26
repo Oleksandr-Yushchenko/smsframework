@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\sms_sendtophone\Functional;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -28,6 +27,11 @@ class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
     'field',
     'field_ui',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
 
   /**
    * The phone field for testing.
@@ -67,7 +71,7 @@ class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'user',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'field_name' => mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $this->phoneField->save();
@@ -201,7 +205,7 @@ class SmsSendToPhoneBrowserTest extends SmsFrameworkBrowserTestBase {
   public function testFieldFormatAndWidget() {
     // Create a custom field of type 'text' using the sms_sendtophone formatter.
     $bundles = array_keys(NodeType::loadMultiple());
-    $field_name = Unicode::strtolower($this->randomMachineName());
+    $field_name = mb_strtolower($this->randomMachineName());
     $field_definition = [
       'field_name' => $field_name,
       'entity_type' => 'node',

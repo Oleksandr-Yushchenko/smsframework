@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\sms\Kernel;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\entity_test\Entity\EntityTest;
@@ -77,7 +76,7 @@ class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBase {
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'field_name' => mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $this->phoneField->save();
@@ -124,7 +123,7 @@ class SmsFrameworkPhoneNumberVerificationTest extends SmsFrameworkKernelBase {
       'type' => $this->randomMachineName(),
     ]);
 
-    $this->setExpectedException(PhoneNumberSettingsException::class);
+    $this->expectException(PhoneNumberSettingsException::class);
     $this->phoneNumberVerificationProvider->getPhoneNumberSettingsForEntity($test_entity_random_bundle);
   }
 

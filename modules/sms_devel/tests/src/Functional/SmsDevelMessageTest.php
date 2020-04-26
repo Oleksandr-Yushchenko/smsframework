@@ -21,6 +21,11 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
   public static $modules = ['sms_devel'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
    * A memory gateway.
    *
    * @var \Drupal\sms\Entity\SmsGatewayInterface
@@ -49,7 +54,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $messages = $this->getTestMessages($this->gateway);
@@ -66,7 +70,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Message added to the outgoing queue.');
 
     $messages = SmsMessage::loadMultiple();
@@ -85,7 +88,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $this->assertEquals($edit['message'], sms_test_gateway_get_incoming()['message']);
@@ -101,7 +103,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Message added to the incoming queue.');
 
     $messages = SmsMessage::loadMultiple();
@@ -117,7 +118,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['gateway'] = '';
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Receive'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Gateway must be selected if receiving a message.');
   }
 
@@ -131,7 +131,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['automated'] = FALSE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertSession()->statusCodeEquals(200);
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
@@ -151,11 +150,10 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     // The user inputs field values in its own timezone, then it is auto
     // converted on field submission to UTC.
     $date_user = $date;
-    $date_user->setTimezone(timezone_open(drupal_get_user_timezone()));
+    $date_user->setTimezone(new \DateTimeZone(date_default_timezone_get()));
     $edit['send_on[date]'] = $date_user->format('Y-m-d');
     $edit['send_on[time]'] = $date_user->format('H:i:s');
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertSession()->statusCodeEquals(200);
 
     $messages = SmsMessage::loadMultiple();
     $message = reset($messages);
@@ -173,7 +171,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['skip_queue'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Message could not be sent');
 
     $messages = $this->getTestMessages($this->gateway);
@@ -191,7 +188,6 @@ class SmsDevelMessageTest extends SmsFrameworkBrowserTestBase {
     $edit['verbose'] = TRUE;
 
     $this->drupalPostForm(Url::fromRoute('sms_devel.message'), $edit, t('Send'));
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Message was processed, 1 delivery reports were generated.');
 
     $first_row = '#edit-results > tbody > tr:nth-child(1)';

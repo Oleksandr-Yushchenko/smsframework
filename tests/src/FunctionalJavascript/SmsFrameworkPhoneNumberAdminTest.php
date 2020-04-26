@@ -2,8 +2,7 @@
 
 namespace Drupal\Tests\sms\FunctionalJavascript;
 
-use Drupal\Component\Utility\Unicode;
-use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
 
 /**
@@ -11,9 +10,14 @@ use Drupal\Tests\sms\Functional\SmsFrameworkTestTrait;
  *
  * @group SMS Framework
  */
-class SmsFrameworkPhoneNumberAdminTest extends JavascriptTestBase {
+class SmsFrameworkPhoneNumberAdminTest extends WebDriverTestBase {
 
   use SmsFrameworkTestTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
 
   /**
    * {@inheritdoc}
@@ -56,7 +60,7 @@ class SmsFrameworkPhoneNumberAdminTest extends JavascriptTestBase {
     /** @var \Drupal\field\FieldStorageConfigInterface $field_telephone */
     $field_telephone = $field_storage->create([
       'entity_type' => 'entity_test',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'field_name' => mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $field_telephone->save();
@@ -78,7 +82,6 @@ class SmsFrameworkPhoneNumberAdminTest extends JavascriptTestBase {
       ->click();
 
     $this->drupalGet('admin/config/smsframework/phone_number/entity_test.entity_test');
-    $session->statusCodeEquals(200);
     $session->optionExists('edit-field-mapping-phone-number', $field_telephone->getName())
       ->hasAttribute('selected');
   }

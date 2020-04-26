@@ -7,7 +7,6 @@ use Drupal\sms\Exception\NoPhoneNumberException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\sms\Entity\PhoneNumberSettings;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Message\SmsMessage;
 
 /**
@@ -76,7 +75,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
 
     $this->phoneField = FieldStorageConfig::create([
       'entity_type' => 'entity_test',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'field_name' => mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $this->phoneField->save();
@@ -196,7 +195,7 @@ class SmsFrameworkPhoneNumberProviderTest extends SmsFrameworkKernelBase {
     $sms_message
       ->setSenderNumber('+999888777')
       ->setMessage($this->randomString());
-    $this->setExpectedException(NoPhoneNumberException::class);
+    $this->expectException(NoPhoneNumberException::class);
     $this->phoneNumberProvider->sendMessage($entity, $sms_message);
   }
 

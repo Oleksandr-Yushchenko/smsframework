@@ -3,7 +3,6 @@
 namespace Drupal\Tests\sms\Functional;
 
 use Drupal\Core\Url;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Direction;
 use Drupal\sms\Entity\SmsGateway;
 
@@ -95,7 +94,7 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
 
     $edit = [
       'label' => $this->randomString(),
-      'id' => Unicode::strtolower($this->randomMachineName()),
+      'id' => mb_strtolower($this->randomMachineName()),
       'status' => TRUE,
       'plugin_id' => 'memory',
     ];
@@ -242,7 +241,6 @@ class SmsFrameworkGatewayAdminTest extends SmsFrameworkBrowserTestBase {
       'sms_gateway' => $gateway->id(),
     ]));
 
-    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Edit gateway');
     $this->assertSession()->fieldNotExists('incoming_messages[push_path]');
     $this->assertSession()->responseContains(t('This gateway does not support receiving messages.'));

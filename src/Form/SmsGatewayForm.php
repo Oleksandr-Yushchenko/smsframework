@@ -2,11 +2,11 @@
 
 namespace Drupal\sms\Form;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Url;
@@ -43,13 +43,6 @@ class SmsGatewayForm extends EntityForm {
   protected $accessManager;
 
   /**
-   * The entity query factory.
-   *
-   * @var \Drupal\Core\Entity\Query\QueryFactory
-   */
-  protected $entityQueryFactory;
-
-  /**
    * The gateway manager.
    *
    * @var \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface
@@ -57,7 +50,14 @@ class SmsGatewayForm extends EntityForm {
   protected $gatewayManager;
 
   /**
-   * Constructs a new SmsGatewayForm object.
+   * Gateway storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $gatewayStorage;
+
+  /**
+   * Constructs a new SmsGatewayForm.
    *
    * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
    *   The route builder.
@@ -65,17 +65,20 @@ class SmsGatewayForm extends EntityForm {
    *   The request context.
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
    *   The access manager.
-   * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
-   *   The entity query factory.
    * @param \Drupal\sms\Plugin\SmsGatewayPluginManagerInterface $gateway_manager
    *   The gateway manager service.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   Entity type manager.
    */
-  public function __construct(RouteBuilderInterface $route_builder, RequestContext $request_context, AccessManagerInterface $access_manager, QueryFactory $query_factory, SmsGatewayPluginManagerInterface $gateway_manager) {
+  public function __construct(RouteBuilderInterface $route_builder, RequestContext $request_context, AccessManagerInterface $access_manager, SmsGatewayPluginManagerInterface $gateway_manager, MessengerInterface $messenger, EntityTypeManagerInterface $entityTypeManager) {
     $this->routeBuilder = $route_builder;
     $this->requestContext = $request_context;
     $this->accessManager = $access_manager;
-    $this->entityQueryFactory = $query_factory;
     $this->gatewayManager = $gateway_manager;
+    $this->setMessenger($messenger);
+    $this->gatewayStorage = $entityTypeManager->getStorage('sms_gateway');
   }
 
   /**
@@ -86,8 +89,9 @@ class SmsGatewayForm extends EntityForm {
       $container->get('router.builder'),
       $container->get('router.request_context'),
       $container->get('access_manager'),
-      $container->get('entity.query'),
-      $container->get('plugin.manager.sms_gateway')
+      $container->get('plugin.manager.sms_gateway'),
+      $container->get('messenger'),
+      $container->get('entity_type.manager'),
     );
   }
 
@@ -264,11 +268,11 @@ class SmsGatewayForm extends EntityForm {
     foreach ($path_elements_parents as $parents) {
       $element = NestedArray::getValue($form, $parents);
       $path = $form_state->getValue($parents);
-      $path_length = Unicode::strlen($path);
+      $path_length = mb_strlen($path);
 
       // Length must be more than 2 chars, including leading slash character.
       if ($path_length > 0) {
-        if (Unicode::substr($path, 0, 1) !== '/') {
+        if (mb_substr($path, 0, 1) !== '/') {
           $form_state->setError($element, $this->t("Path must begin with a '/' character."));
         }
         if ($path_length == 1) {
@@ -313,7 +317,7 @@ class SmsGatewayForm extends EntityForm {
     $saved = $sms_gateway->save();
 
     if ($saved == SAVED_NEW) {
-      drupal_set_message($this->t('Gateway created.'));
+      $this->messenger()->addMessage($this->t('Gateway created.'));
       $rebuild = !empty($incoming_push_path) || !empty($reports_push_path);
 
       // Redirect to edit form.
@@ -322,7 +326,7 @@ class SmsGatewayForm extends EntityForm {
       ]));
     }
     else {
-      drupal_set_message($this->t('Gateway saved.'));
+      $this->messenger()->addMessage($this->t('Gateway saved.'));
 
       // Only rebuild routes if the paths changed.
       $rebuild_incoming = $incoming_push_path_original != $incoming_push_path;
@@ -344,8 +348,9 @@ class SmsGatewayForm extends EntityForm {
    * Callback for `id` form element in SmsGatewayForm->buildForm.
    */
   public function exists($entity_id, array $element, FormStateInterface $form_state) {
-    $query = $this->entityQueryFactory->get('sms_gateway');
-    return (bool) $query->condition('id', $entity_id)->execute();
+    return (bool) $this->gatewayStorage->getQuery()
+      ->condition('id', $entity_id)
+      ->execute();
   }
 
 }

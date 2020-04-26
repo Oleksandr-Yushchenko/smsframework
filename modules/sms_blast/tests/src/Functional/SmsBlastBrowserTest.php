@@ -5,7 +5,6 @@ namespace Drupal\Tests\sms_blast\Functional;
 use Drupal\Tests\sms\Functional\SmsFrameworkBrowserTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\PhoneNumberSettings;
 
 /**
@@ -19,6 +18,11 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
    * {@inheritdoc}
    */
   public static $modules = ['sms', 'user', 'sms_blast'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
 
   /**
    * Phone number settings of user entity type.
@@ -39,7 +43,7 @@ class SmsBlastBrowserTest extends SmsFrameworkBrowserTestBase {
 
     $phone_field = FieldStorageConfig::create([
       'entity_type' => 'user',
-      'field_name' => Unicode::strtolower($this->randomMachineName()),
+      'field_name' => mb_strtolower($this->randomMachineName()),
       'type' => 'telephone',
     ]);
     $phone_field->save();

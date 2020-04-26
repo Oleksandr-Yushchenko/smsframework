@@ -5,7 +5,6 @@ namespace Drupal\Tests\sms\Functional;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\sms\Entity\PhoneNumberSettingsInterface;
 use Drupal\sms\Entity\SmsGateway;
-use Drupal\Component\Utility\Unicode;
 use Drupal\sms\Entity\SmsGatewayInterface;
 use Drupal\sms\Message\SmsMessage;
 use Drupal\sms\Message\SmsDeliveryReport;
@@ -40,7 +39,7 @@ trait SmsFrameworkTestTrait {
    *   A saved memory gateway.
    */
   protected function createMemoryGateway(array $values = []) {
-    $id = isset($values['id']) ? $values['id'] : Unicode::strtolower($this->randomMachineName(16));
+    $id = isset($values['id']) ? $values['id'] : mb_strtolower($this->randomMachineName(16));
     $gateway = SmsGateway::create($values + [
       'plugin' => 'memory',
       'id' => $id,
