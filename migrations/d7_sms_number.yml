@@ -10,7 +10,7 @@ process:
     plugin: default_value
     default_value: user
   'entity/target_id':
-    plugin: migration
+    plugin: migration_lookup
     migration: d7_user
     source: uid
   phone: number

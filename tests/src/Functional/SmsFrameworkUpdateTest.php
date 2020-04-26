@@ -34,7 +34,7 @@ class SmsFrameworkUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles() {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../../../../core/modules/system/tests/fixtures/update/drupal-8.bare.standard.php.gz',
+      __DIR__ . '/../../../../../../core/modules/system/tests/fixtures/update/drupal-8.8.0.bare.standard.php.gz',
       __DIR__ . '/../../../tests/fixtures/update/sms-8.x-1.x-result-field-2836157.php.gz',
     ];
   }
