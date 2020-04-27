@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\sms_user\Form;
 
 use Drupal\Core\Messenger\MessengerInterface;
@@ -407,7 +409,7 @@ class AdminSettingsForm extends ConfigFormBase {
 
       $regex = '/(' . implode('|', $regex_placeholder) . '+)/';
       $last_word_is_placeholder = FALSE;
-      foreach (preg_split($regex, $incoming_message, NULL, PREG_SPLIT_DELIM_CAPTURE) as $word) {
+      foreach (preg_split($regex, $incoming_message, -1, PREG_SPLIT_DELIM_CAPTURE) as $word) {
         if ($word === '') {
           continue;
         }

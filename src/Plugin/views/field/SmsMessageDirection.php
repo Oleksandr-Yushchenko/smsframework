@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\sms\Plugin\views\field;
 
 use Drupal\views\Plugin\views\field\FieldPluginBase;
