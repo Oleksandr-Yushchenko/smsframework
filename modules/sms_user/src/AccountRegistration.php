@@ -285,7 +285,7 @@ class AccountRegistration implements AccountRegistrationInterface {
     // e.g. for 'U [username] P [password], splits to:
     // 'U ', '[username]', ' P ', '[password]'.
     $regex = '/(' . implode('|', $regex_placeholders) . '+)/';
-    $words = preg_split($regex, $form_string, NULL, PREG_SPLIT_DELIM_CAPTURE);
+    $words = preg_split($regex, $form_string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
     // Track if a placeholder was used, so subsequent usages create a named back
     // reference. This allows you to use placeholders more than once as a form
