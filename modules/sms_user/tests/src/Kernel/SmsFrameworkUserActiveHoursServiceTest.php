@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\sms_user\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\sms\Unit\Message;
 
 use Drupal\Component\Uuid\Php;
